@@ -1,4 +1,4 @@
-module code
+module github.com/Markoni23/go-project-242
 
 go 1.25
 
