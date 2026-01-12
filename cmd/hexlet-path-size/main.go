@@ -1,9 +1,9 @@
 package main
 
 import (
-	"code/code"
 	"context"
 	"fmt"
+	"go-project-242/code"
 	"log"
 	"os"
 
@@ -23,9 +23,9 @@ func baseAction(ctx context.Context, cmd *cli.Command) error {
 
 	res, err := code.GetPathSize(
 		&code.GetPathSizeDTO{
-			Path: path,
+			Path:           path,
 			IncludeHiddens: isIncludeHiddens,
-			Recursive: isRecursive,
+			Recursive:      isRecursive,
 		},
 	)
 
