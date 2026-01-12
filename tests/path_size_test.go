@@ -11,35 +11,49 @@ import (
 func TestGetSize(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata"
-	res, _ := code.GetPathSize(fixturePath)
+	res, _ := code.GetPathSize(fixturePath, false)
 	require.Equal(t, int64(1049625), res)
 }
 
 func TestGetSizeDirectory(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata/fixture_directory_1,2mb"
-	res, _ := code.GetPathSize(fixturePath)
+	res, _ := code.GetPathSize(fixturePath, false)
 	require.Equal(t, int64(1150974), res)
 }
 
 func TestGetSizeFile(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata/fixture_1kb.png"
-	res, _ := code.GetPathSize(fixturePath)
+	res, _ := code.GetPathSize(fixturePath, false)
 	require.Equal(t, int64(1049), res)
 }
 
 func TestGetSizeError(t *testing.T) {
 	fixturePath := ""
-	_, err := code.GetPathSize(fixturePath)
+	_, err := code.GetPathSize(fixturePath, false)
 	require.EqualError(t, err, "Empty path")
 }
 
 func TestHumanSize(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata/fixture_1kb.png"
-	res, _ := code.GetPathSize(fixturePath)
+	res, _ := code.GetPathSize(fixturePath, false)
 	humanFormat := code.FormatSize(res, true)
 
 	require.Equal(t, "1.0kB", humanFormat)
+}
+
+func TestWithoutHiddens(t *testing.T) {
+	cwd, _ := os.Getwd()
+	fixturePath := cwd + "/testdata/fixture_directory_with_hidden"
+	res, _ := code.GetPathSize(fixturePath, false)
+	require.Equal(t, int64(1048575), res)
+}
+
+func TestIncludeHiddens(t *testing.T) {
+	cwd, _ := os.Getwd()
+	fixturePath := cwd + "/testdata/fixture_directory_with_hidden"
+	res, _ := code.GetPathSize(fixturePath, true)
+	require.Equal(t, int64(2097150), res)
 }

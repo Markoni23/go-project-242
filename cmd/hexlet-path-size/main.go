@@ -16,9 +16,11 @@ func baseAction(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	path := cmd.Args().Get(0)
-	isHumanFormat := cmd.Bool("human")
 
-	res, err := code.GetPathSize(path)
+	isHumanFormat := cmd.Bool("human")
+	isIncludeHiddens := cmd.Bool("all")
+
+	res, err := code.GetPathSize(path, isIncludeHiddens)
 
 	if err != nil {
 		return err
@@ -34,9 +36,16 @@ func main() {
 		Name: "hexlet-path-size",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:  "human, h",
-				Value: false,
-				Usage: "human-readable sizes (auto-select unit)",
+				Name:    "human, H",
+				Value:   false,
+				Usage:   "human-readable sizes (auto-select unit)",
+				Aliases: []string{"H"},
+			},
+			&cli.BoolFlag{
+				Name:    "all, a",
+				Value:   false,
+				Usage:   "include hidden files and directories",
+				Aliases: []string{"a"},
 			},
 		},
 		Usage:  "print size of a file or directory",

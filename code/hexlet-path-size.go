@@ -4,17 +4,13 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strings"
 )
 
-func GetPathSize(path string) (int64, error) {
+func GetPathSize(path string, includeHiddens bool) (int64, error) {
 	if path == "" {
 		return -1, fmt.Errorf("Empty path")
 	}
-
-	//absPath, err := filepath.Abs(path)
-	//if err != nil {
-	//	return "", err
-	//}
 
 	info, err := os.Lstat(path)
 
@@ -24,8 +20,7 @@ func GetPathSize(path string) (int64, error) {
 
 	var size int64
 	if info.IsDir() {
-
-		size = getDirectorySize(path)
+		size = getDirectorySize(path, includeHiddens)
 	} else {
 		size = info.Size()
 	}
@@ -33,7 +28,7 @@ func GetPathSize(path string) (int64, error) {
 	return size, nil
 }
 
-func getDirectorySize(path string) int64 {
+func getDirectorySize(path string, includeHiddens bool) int64 {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return 0
@@ -44,6 +39,11 @@ func getDirectorySize(path string) int64 {
 			continue
 			//sum += getDirectorySize(filepath.Join(path, entry.Name()))
 		}
+
+		if !includeHiddens && strings.HasPrefix(entry.Name(), ".") {
+			continue
+		}
+
 		info, err := entry.Info()
 		if err != nil {
 			return 0
