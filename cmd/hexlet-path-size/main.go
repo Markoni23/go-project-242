@@ -19,8 +19,15 @@ func baseAction(ctx context.Context, cmd *cli.Command) error {
 
 	isHumanFormat := cmd.Bool("human")
 	isIncludeHiddens := cmd.Bool("all")
+	isRecursive := cmd.Bool("recursive")
 
-	res, err := code.GetPathSize(path, isIncludeHiddens)
+	res, err := code.GetPathSize(
+		&code.GetPathSizeDTO{
+			Path: path,
+			IncludeHiddens: isIncludeHiddens,
+			Recursive: isRecursive,
+		},
+	)
 
 	if err != nil {
 		return err
@@ -47,8 +54,14 @@ func main() {
 				Usage:   "include hidden files and directories",
 				Aliases: []string{"a"},
 			},
+			&cli.BoolFlag{
+				Name:    "recursive, r",
+				Value:   false,
+				Usage:   " recursive size of directories",
+				Aliases: []string{"r"},
+			},
 		},
-		Usage:  "print size of a file or directory",
+		Usage:  "print size of a file or directory; supports -r (recursive), -H (human-readable), -a (include hidden)",
 		Action: baseAction,
 	}
 

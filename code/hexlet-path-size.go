@@ -4,15 +4,22 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
-func GetPathSize(path string, includeHiddens bool) (int64, error) {
-	if path == "" {
+type GetPathSizeDTO struct {
+	Path           string
+	IncludeHiddens bool
+	Recursive      bool
+}
+
+func GetPathSize(dto *GetPathSizeDTO) (int64, error) {
+	if dto.Path == "" {
 		return -1, fmt.Errorf("Empty path")
 	}
 
-	info, err := os.Lstat(path)
+	info, err := os.Lstat(dto.Path)
 
 	if err != nil {
 		return -1, err
@@ -20,7 +27,7 @@ func GetPathSize(path string, includeHiddens bool) (int64, error) {
 
 	var size int64
 	if info.IsDir() {
-		size = getDirectorySize(path, includeHiddens)
+		size = getDirectorySize(dto)
 	} else {
 		size = info.Size()
 	}
@@ -28,19 +35,28 @@ func GetPathSize(path string, includeHiddens bool) (int64, error) {
 	return size, nil
 }
 
-func getDirectorySize(path string, includeHiddens bool) int64 {
-	entries, err := os.ReadDir(path)
+func getDirectorySize(dto *GetPathSizeDTO) int64 {
+	entries, err := os.ReadDir(dto.Path)
 	if err != nil {
 		return 0
 	}
 	var sum int64
 	for _, entry := range entries {
 		if entry.IsDir() {
-			continue
-			//sum += getDirectorySize(filepath.Join(path, entry.Name()))
+			if dto.Recursive {
+				sum += getDirectorySize(
+					&GetPathSizeDTO{
+						Path:           filepath.Join(dto.Path, entry.Name()),
+						IncludeHiddens: dto.IncludeHiddens,
+						Recursive:      dto.Recursive,
+					},
+				)
+			} else {
+				continue
+			}
 		}
 
-		if !includeHiddens && strings.HasPrefix(entry.Name(), ".") {
+		if !dto.IncludeHiddens && strings.HasPrefix(entry.Name(), ".") {
 			continue
 		}
 
