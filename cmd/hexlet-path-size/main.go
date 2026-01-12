@@ -16,20 +16,29 @@ func baseAction(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	path := cmd.Args().Get(0)
+	isHumanFormat := cmd.Bool("human")
+
 	res, err := code.GetPathSize(path)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s\t%s\n", res, path)
+	fmt.Printf("%s\t%s\n", code.FormatSize(res, isHumanFormat), path)
 
 	return nil
 }
 
 func main() {
 	cmd := &cli.Command{
-		Name:   "hexlet-path-size",
+		Name: "hexlet-path-size",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "human, h",
+				Value: false,
+				Usage: "human-readable sizes (auto-select unit)",
+			},
+		},
 		Usage:  "print size of a file or directory",
 		Action: baseAction,
 	}

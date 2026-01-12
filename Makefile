@@ -8,5 +8,10 @@ build:
 install:
 	go install
 
+
+ARGS?=tests/testdata
+run:
+	go run ./cmd/hexlet-path-size/main.go $(ARGS)
+
 lint:
 	golangci-lint run ./...
