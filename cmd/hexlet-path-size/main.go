@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code/pkg"
+	"code/code"
 	"context"
 	"fmt"
 	"log"
@@ -12,17 +12,17 @@ import (
 
 func baseAction(ctx context.Context, cmd *cli.Command) error {
 	if cmd.NArg() != 1 {
-		return fmt.Errorf("Error")
+		return fmt.Errorf("missing operand")
 	}
 
 	path := cmd.Args().Get(0)
-	res, err := pkg.GetPathSize(path)
+	res, err := code.GetPathSize(path)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(res)
+	fmt.Printf("%s\t%s\n", res, path)
 
 	return nil
 }
