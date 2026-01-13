@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"go-project-242/code"
+	"code/code"
 	"os"
 	"testing"
 

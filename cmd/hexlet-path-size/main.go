@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-project-242/code"
+	"code/code"
 	"log"
 	"os"
 
