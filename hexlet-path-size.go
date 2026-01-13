@@ -23,7 +23,11 @@ func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	if info.IsDir() {
 		size = getDirectorySize(path, recursive, human, all)
 	} else {
-		size = info.Size()
+		if !all && strings.HasPrefix(info.Name(), ".") {
+			size = 0
+		} else {
+			size = info.Size()
+		}
 	}
 
 	return fmt.Sprint(FormatSize(size, human)), nil
@@ -61,7 +65,7 @@ func getDirectorySize(path string, recursive, human, all bool) int64 {
 
 func FormatSize(size int64, isHumanFormat bool) string {
 	if isHumanFormat {
-		return humanateBytes(uint64(size), 1000, []string{"B", "kB", "MB", "GB", "TB", "PB", "EB"})
+		return humanateBytes(uint64(size), 1000, []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"})
 	}
 	return fmt.Sprintf("%dB", size)
 }
