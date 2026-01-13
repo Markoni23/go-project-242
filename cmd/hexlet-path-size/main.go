@@ -1,11 +1,12 @@
 package main
 
 import (
+	"code"
 	"context"
 	"fmt"
-	"code"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/urfave/cli/v3"
 )
@@ -21,19 +22,18 @@ func baseAction(ctx context.Context, cmd *cli.Command) error {
 	isIncludeHiddens := cmd.Bool("all")
 	isRecursive := cmd.Bool("recursive")
 
-	res, err := code.GetPathSize(
-		&code.GetPathSizeDTO{
-			Path:           path,
-			IncludeHiddens: isIncludeHiddens,
-			Recursive:      isRecursive,
-		},
-	)
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	res, err := code.GetPathSize(filepath.Join(dir, path), isRecursive, isHumanFormat, isIncludeHiddens)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s\t%s\n", code.FormatSize(res, isHumanFormat), path)
+	fmt.Printf("%s\t%s\n", res, path)
 
 	return nil
 }
@@ -57,7 +57,7 @@ func main() {
 			&cli.BoolFlag{
 				Name:    "recursive, r",
 				Value:   false,
-				Usage:   " recursive size of directories",
+				Usage:   "recursive size of directories",
 				Aliases: []string{"r"},
 			},
 		},
