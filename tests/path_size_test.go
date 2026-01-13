@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"code/code"
+	"code"
 	"os"
 	"testing"
 
