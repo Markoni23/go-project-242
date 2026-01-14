@@ -10,7 +10,7 @@ import (
 
 func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	if path == "" {
-		return "", fmt.Errorf("Empty path")
+		return "", fmt.Errorf("empty path")
 	}
 
 	info, err := os.Lstat(path)
