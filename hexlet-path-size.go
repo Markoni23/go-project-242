@@ -47,9 +47,8 @@ func getDirectorySize(path string, recursive, human, all bool) int64 {
 		if entry.IsDir() {
 			if recursive {
 				sum += getDirectorySize(filepath.Join(path, entry.Name()), recursive, human, all)
-			} else {
-				continue
 			}
+			continue
 		}
 
 		info, err := entry.Info()

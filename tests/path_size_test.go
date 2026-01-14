@@ -69,3 +69,10 @@ func TestWithRecursive(t *testing.T) {
 	res, _ := code.GetPathSize(fixturePath, true, false, false)
 	require.Equal(t, "3257366B", res)
 }
+
+func TestFolderWithdNested(t *testing.T) {
+	cwd, _ := os.Getwd()
+	fixturePath := cwd + "/testdata/fixture_with_hidden_and_nested"
+	res, _ := code.GetPathSize(fixturePath, true, false, false)
+	require.Equal(t, "18B", res)
+}
