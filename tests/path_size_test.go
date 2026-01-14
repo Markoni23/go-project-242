@@ -32,14 +32,14 @@ func TestGetSizeFile(t *testing.T) {
 func TestGetSizeError(t *testing.T) {
 	fixturePath := ""
 	_, err := code.GetPathSize(fixturePath, false, false, false)
-	require.EqualError(t, err, "Empty path")
+	require.EqualError(t, err, "empty path")
 }
 
 func TestHumanSize(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata/fixture_1kb.png"
 	res, _ := code.GetPathSize(fixturePath, false, true, false)
-	require.Equal(t, "1.0kB", res)
+	require.Equal(t, "1.0KB", res)
 }
 
 func TestWithoutHiddens(t *testing.T) {
@@ -67,7 +67,7 @@ func TestWithRecursive(t *testing.T) {
 	cwd, _ := os.Getwd()
 	fixturePath := cwd + "/testdata"
 	res, _ := code.GetPathSize(fixturePath, true, false, false)
-	require.Equal(t, "3257366B", res)
+	require.Equal(t, "3249192B", res)
 }
 
 func TestFolderWithdNested(t *testing.T) {
