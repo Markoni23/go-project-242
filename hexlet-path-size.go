@@ -2,7 +2,6 @@ package code
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,10 @@ func GetPathSize(path string, recursive, human, all bool) (string, error) {
 
 	var size int64
 	if info.IsDir() {
-		size = getDirectorySize(path, recursive, human, all)
+		size, err = getDirectorySize(path, recursive, human, all)
+		if err != nil {
+			return "", err
+		}
 	} else {
 		if !all && strings.HasPrefix(info.Name(), ".") {
 			size = 0
@@ -33,10 +35,10 @@ func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	return fmt.Sprint(FormatSize(size, human)), nil
 }
 
-func getDirectorySize(path string, recursive, human, all bool) int64 {
+func getDirectorySize(path string, recursive, human, all bool) (int64, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		return 0
+		return -1, err
 	}
 	var sum int64
 	for _, entry := range entries {
@@ -46,44 +48,45 @@ func getDirectorySize(path string, recursive, human, all bool) int64 {
 
 		if entry.IsDir() {
 			if recursive {
-				sum += getDirectorySize(filepath.Join(path, entry.Name()), recursive, human, all)
+				nestedDirSize, err := getDirectorySize(filepath.Join(path, entry.Name()), recursive, human, all)
+				if err != nil {
+					return -1, err
+				}
+				sum += nestedDirSize
 			}
 			continue
 		}
 
 		info, err := entry.Info()
 		if err != nil {
-			return 0
+			return -1, err
 		}
 
 		sum += info.Size()
 	}
 
-	return sum
+	return sum, nil
 }
 
 func FormatSize(size int64, isHumanFormat bool) string {
 	if isHumanFormat {
-		return humanateBytes(uint64(size), 1000, []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"})
+		return humanizeBytes(size)
 	}
 	return fmt.Sprintf("%dB", size)
 }
 
-func humanateBytes(s uint64, base float64, sizes []string) string {
-	if s < 10 {
-		return fmt.Sprintf("%dB", s)
-	}
-	e := math.Floor(logn(float64(s), base))
-	suffix := sizes[int(e)]
-	val := math.Floor(float64(s)/math.Pow(base, e)*10+0.5) / 10
-	f := "%.0f%s"
-	if val < 10 {
-		f = "%.1f%s"
+func humanizeBytes(bytes int64) string {
+	if bytes == 0 {
+		return "0 Bytes"
 	}
 
-	return fmt.Sprintf(f, val, suffix)
-}
+	const base = 1000
+	suffixes := " KMGTPE"
 
-func logn(n, b float64) float64 {
-	return math.Log(n) / math.Log(b)
+	div, exp := 1, 0
+	for n := bytes ; n >= base; n /= base {
+		div *= base
+		exp++
+	}
+	return fmt.Sprintf("%.1f%cB", float64(bytes)/float64(div), suffixes[exp])
 }
