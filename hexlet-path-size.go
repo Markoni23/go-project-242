@@ -76,11 +76,10 @@ func FormatSize(size int64, isHumanFormat bool) string {
 }
 
 func humanizeBytes(bytes int64) string {
-	if bytes == 0 {
-		return "0 Bytes"
-	}
-
 	const base = 1000
+	if bytes < base {
+		return fmt.Sprintf("%dB", bytes)
+	}
 	suffixes := " KMGTPE"
 
 	div, exp := 1, 0
